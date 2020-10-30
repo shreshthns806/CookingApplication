@@ -18,6 +18,7 @@ import {
 import { Header, Input, Icon } from 'react-native-elements';
 import * as Font from 'expo-font';
 import {AppLoading} from 'expo';
+import DropDownPicker from 'react-native-dropdown-picker';
  
  
 //Creating and exporting class
@@ -27,133 +28,49 @@ export default class AddRecipeScreen extends Component {
     constructor(){
         super()
         this.state = {
-            basicIngridients:'',
-            requiredIngridients:'',
-            cuisine:'',
+            cuisine:'unknown',
             recipe:'',
             dishName:'',
+            ingridients:'',
             background1 : 'white',
             background2 : 'white',
             background3 : 'white',
             background4 : 'white',
-            background5 : 'white',
-            background6 : 'white',
-            background7 : 'white',
-            background8 : 'white',
 
         }
     }
 
-    onTextInputFocus1 = (focus)=>{
-        if(focus == 'focus'){
+    addDish = ()=>{
+        const recipe = this.state.recipe
+        const ingridients = this.state.ingridients
+        const cuisine = this.state.cuisine
+        const dish = this.state.dishName
+
+        if(recipe!='' && ingridients!='' && cuisine!=''&&dish!=''){
+            db.collection('dishes').add({
+                'dishName' : dish,
+                'cuisine' : cuisine,
+                'ingridients' : ingridients,
+                'recipe' : recipe,
+            })
+    
+            Alert.alert('Dish added succesfully')
             this.setState({
-                background1 : '#363636'
+                cuisine:'',
+                recipe:'',
+                dishName:'',
+                ingridients:'',
+                background1 : 'white',
+                background2 : 'white',
+                background3 : 'white',
+                background4 : 'white',
             })
         }
 
-        if(focus == 'blur'){
-            this.setState({
-                background1 : 'white'
-            })
-        }
-    }
-
-    onTextInputFocus2 = (focus)=>{
-        if(focus == 'focus'){
-            this.setState({
-                background2 : '#363636'
-            })
+        else {
+            Alert.alert('Please fill all entries')
         }
 
-        if(focus == 'blur'){
-            this.setState({
-                background2 : 'white'
-            })
-        }
-    }
-
-    onTextInputFocus3 = (focus)=>{
-        if(focus == 'focus'){
-            this.setState({
-                background3 : '#363636'
-            })
-        }
-
-        if(focus == 'blur'){
-            this.setState({
-                background3 : 'white'
-            })
-        }
-    }
-
-    onTextInputFocus4 = (focus)=>{
-        if(focus == 'focus'){
-            this.setState({
-                background4 : '#363636'
-            })
-        }
-
-        if(focus == 'blur'){
-            this.setState({
-                background5 : 'white'
-            })
-        }
-    }
-
-    onTextInputFocus5 = (focus)=>{
-        if(focus == 'focus'){
-            this.setState({
-                background6 : '#363636'
-            })
-        }
-
-        if(focus == 'blur'){
-            this.setState({
-                background6 : 'white'
-            })
-        }
-    }
-
-    onTextInputFocus6 = (focus)=>{
-        if(focus == 'focus'){
-            this.setState({
-                background6 : '#363636'
-            })
-        }
-
-        if(focus == 'blur'){
-            this.setState({
-                background6 : 'white'
-            })
-        }
-    }
-
-    onTextInputFocus7 = (focus)=>{
-        if(focus == 'focus'){
-            this.setState({
-                background7 : '#363636'
-            })
-        }
-
-        if(focus == 'blur'){
-            this.setState({
-                background7 : 'white'
-            })
-        }
-    }
-
-    onTextInputFocus8 = (focus)=>{
-        if(focus == 'focus'){
-            this.setState({
-                background8 : '#363636'
-            })
-        }
-
-        if(focus == 'blur'){
-            this.setState({
-                background8 : 'white'
-            })
-        }
     }
 
     //Render function
@@ -172,11 +89,12 @@ export default class AddRecipeScreen extends Component {
                             this.props.navigation.toggleDrawer()
                             //Alert.alert("Inside Icon Tag")
                         }}
+                        style = {{alignSelf:'flex-start', marginTop:30, marginLeft:15,}}
                     >
                         <Icon
                             name = 'bars'
-                            type = 'font-awesome'    
-                            style = {{alignSelf:'flex-start', marginTop:30, marginLeft:15,}}
+                            type = 'font-awesome'
+                            color = 'white'    
                         />
                     </TouchableOpacity>
                     <Text style = {styles.header}>Add Recipes</Text>
@@ -186,62 +104,70 @@ export default class AddRecipeScreen extends Component {
                         Have a great recipe in your mind which you think would be better enjoyed share with the world? People can upvote your recipes, and make it more widely known too! Scroll Down!
                     </Text>
                     <TextInput 
-                        style = {[styles.textInput,{backgroundColor:this.state.background1}]}
+                        style = {[styles.textInput,]}
                         placeholder = 'Your Dish Name'
-                        placeholderTextColor = 'black'
-                        onFocus = {()=>{this.onTextInputFocus1('focus')}}
-                        onBlur = {()=>{this.onTextInputFocus1('blur')}}
+                        placeholderTextColor='white'
+                        value = {this.state.dishName}
+                        onChangeText = {(text)=>{
+                            this.setState({
+                                dishName:text,
+                            })
+                        }}
                     ></TextInput>
+
+                    <DropDownPicker
+                        items = {[
+                            {label:'French', value:'french'},
+                            {label:'Italian', value:'italian'},
+                            {label:'North Indian', value:'northIndian'},
+                            {label:'South Indian', value:'southIndian'},
+                            {label:'American', value:'american'},
+                            {label:'Chinese', value:'chinese'},
+                            {label:'Other', value:'other'},
+                            {label:"I don't know", value:'unknown'},
+                        ]}
+                        containerStyle = {styles.dropDown}
+                        dropDownMaxHeight={1000}
+                        itemStyle = {styles.dropDownItems}
+                        style = {{backgroundColor:'#363636'}}
+                        dropDownStyle={{backgroundColor:'#363636'}}
+                        labelStyle = {{color:'white'}}
+                        arrowColor='white'
+                        placeholder = 'Select a Cuisine'
+                        onChangeItem = {(item)=>{
+                            this.setState({cuisine:item.value})
+                            console.log(item.value)
+                        }}
+                    ></DropDownPicker>
+
                     <TextInput 
-                        style = {[styles.textInput,{backgroundColor:this.state.background2}]}
+                        style = {[styles.textInput,]}
                         multiline = {true}
-                        placeholder = 'Is your dish friendly to any communities [Jain-Friendly, Vegan-Friendly, etc]? If so please mention'
-                        onFocus = {()=>{this.onTextInputFocus2('focus')}}
-                        onBlur = {()=>{this.onTextInputFocus2('blur')}}
+                        placeholder = 'Ingridients required'
+                        placeholderTextColor='white'
+                        value = {this.state.ingridients}
+                        onChangeText = {(text)=>{
+                            this.setState({
+                                ingridients:text,
+                            })
+                        }}
                     ></TextInput>
+
+
                     <TextInput 
-                        style = {[styles.textInput,{backgroundColor:this.state.background3}]}
-                        placeholder = 'Your cuisine, [French, Indian, Italian, etc]'
-                        onFocus = {()=>{this.onTextInputFocus3('focus')}}
-                        onBlur = {()=>{this.onTextInputFocus3('blur')}}
-                    ></TextInput>
-                    <TextInput 
-                        style = {[styles.textInput,{backgroundColor:this.state.background4}]}
-                        multiline = {true}
-                        placeholder = 'Ingridients which can be found in every household, [Salt, Pepper, Turmeric, Water, Masalas, etc]'
-                        onFocus = {()=>{this.onTextInputFocus4('focus')}}
-                        onBlur = {()=>{this.onTextInputFocus4('blur')}}
-                    ></TextInput>
-                    <TextInput 
-                        style = {[styles.textInput,{backgroundColor:this.state.background5}]}
-                        multiline = {true}
-                        placeholder = 'Ingridients which are necessary to make the dish and may not be available in all houses, [Potato, Tomato, Beans, Spinach, Brocolli, etc]'
-                        onFocus = {()=>{this.onTextInputFocus5('focus')}}
-                        onBlur = {()=>{this.onTextInputFocus5('blur')}}
-                    ></TextInput>
-                    <TextInput 
-                        style = {[styles.textInput,{backgroundColor:this.state.background6}]}
-                        multiline = {true}
-                        placeholder = 'Are there any replacable ingridients or ingridients which may not be necessary in the making of recipe? If so, please mention as ReplacableDish1/ReplacableDish2. If none, please write NA'
-                        onFocus = {()=>{this.onTextInputFocus6('focus')}}
-                        onBlur = {()=>{this.onTextInputFocus6('blur')}}
-                    ></TextInput>
-                    <TextInput 
-                        style = {[styles.textInput,{height:490, backgroundColor:this.state.background7}]}
+                        style = {[styles.textInput,{height:490}]}
                         multiline = {true}
                         placeholder = 'Your recipe, [Please enter steps in different lines]'
-                        onFocus = {()=>{this.onTextInputFocus7('focus')}}
-                        onBlur = {()=>{this.onTextInputFocus7('blur')}}
-                    ></TextInput>
-                    <TextInput 
-                        style = {[styles.textInput,{backgroundColor:this.state.background8}]}
-                        multiline = {true}
-                        placeholder = 'Is there any extra information some people may need to know about this recipe? If none, then please write NA'
-                        onFocus = {()=>{this.onTextInputFocus8('focus')}}
-                        onBlur = {()=>{this.onTextInputFocus8('blur')}}
+                        value = {this.state.recipe}
+                        onChangeText = {(text)=>{
+                            this.setState({
+                                recipe:text,
+                            })
+                        }}
                     ></TextInput>
                     <TouchableOpacity
                         style = {styles.button}
+                        onPress = {()=>{this.addDish()}}
                     >
                         <Text style = {styles.buttonText}>I am done!</Text>
                     </TouchableOpacity>
@@ -279,10 +205,13 @@ const styles = StyleSheet.create({
         marginTop:30,
         padding:10,
         alignSelf:'center',
-        backgroundColor:'#656565',
+        backgroundColor:'#363636',
         width:300,
         height:110,
-        color:"black",
+        color:"white",
+        borderWidth:0.5,
+        borderRadius:5,
+        borderColor:'white'
     },
     button : {
         backgroundColor:'#363636',
@@ -302,4 +231,12 @@ const styles = StyleSheet.create({
         textAlign:'center',
         textAlignVertical:'center',
     },
+    dropDown:{
+        marginTop:30,
+        width:300,
+        alignSelf:'center',
+    },
+    dropDownItems : {
+        justifyContent:'flex-start'
+    }
 })
