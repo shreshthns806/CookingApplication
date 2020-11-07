@@ -344,7 +344,7 @@ export default class LoginSignupScreen extends Component {
                     {this.showModal()}            
                    <Image
                         source = {{uri:'https://www.nicepng.com/png/full/280-2801282_soup-clipart-black-and-white-soup-clipart-black.png'}}
-                        style={{ width: 150, marginTop:35, height: 180, alignSelf: 'center', marginBottom:5 }}
+                        style={{ width: 150, marginTop:15, height: 180, alignSelf: 'center', marginBottom:5 }}
                     ></Image>
                     <Text
                         style = {styles.appHeader}
