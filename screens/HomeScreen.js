@@ -12,9 +12,10 @@ import {
     Image,
     TouchableOpacity,
     Alert,
-    KeyboardAvoidingView
+    KeyboardAvoidingView,
+    FlatList
 } from 'react-native';
-import { Header, Input, Icon } from 'react-native-elements';
+import { Header, Input, Icon, ListItem } from 'react-native-elements';
 import * as Font from 'expo-font';
 import {AppLoading} from 'expo';
 
@@ -25,8 +26,25 @@ export default class HomeScreen extends Component {
     constructor(){
         super()
         this.state = {
-
+            latestRecipes : [],
         }
+    }
+
+    //Get latest recipes
+    getLatestRecipes = ()=>{
+        db.collection('dishes').limit(10).onSnapshot(snapshot => {
+            var dishes = snapshot.docs.map(document =>
+                {return document.data()}
+            )
+            this.setState({
+                latestRecipes : dishes,
+            })
+            console.log(this.state.latestRecipes)
+        })
+    }
+
+    componentDidMount(){
+        this.getLatestRecipes();
     }
 
     //Render function
@@ -50,7 +68,10 @@ export default class HomeScreen extends Component {
                 ></Header>
                 <Text style = {styles.subtitle}>What's on your mind?</Text>
                 <View style = {styles.flexContainer}>
-                    <TouchableOpacity style = {styles.button}>
+                    <TouchableOpacity
+                        style = {styles.button}
+                        onPress = {()=>{this.props.navigation.navigate('FindRecipe')}}
+                    >
                         <Text style = {styles.buttonText}>Find Recipes</Text>
                     </TouchableOpacity>
                     <TouchableOpacity 
@@ -74,7 +95,36 @@ export default class HomeScreen extends Component {
                     Having a family recipe in your mind which you want to share to the world? Add your recipe to our database! Other features too!</Text>
                 </View>
                 <Text style = {[styles.subtitle,{marginTop:25}]}>Or, check out our newest recipes!</Text>
-                <Text style = {{color:'red', alignItems:'center',textAlign:'center'}}>Currently under construction!</Text>
+                <ScrollView style = {{backgroundColor:'black',alignSelf:'center', width:'100%',height:10000}}>
+                        <FlatList
+                            data = {this.state.latestRecipes}
+                            keyExtractor = {(item,index)=>{
+                                return index.toString();
+                            }}
+                            renderItem = {
+                                ({item,i})=>{
+                                    return(
+                                        <ListItem
+                                            key = {i}
+                                            title = {item.dishName}
+                                            subtitle = {item.cuisineDisplayName}
+                                            titleStyle = {{color:'white'}}
+                                            subtitleStyle = {{color : 'grey'}}
+                                            containerStyle = {{backgroundColor : 'black'}}
+                                            bottomDivider
+                                            topDivider
+                                            rightElement = {
+                                                <TouchableOpacity
+                                                    style = {styles.button}
+                                                >
+                                                    <Text style = {styles.buttonText}>View</Text>
+                                                </TouchableOpacity>
+                                            }
+                                        ></ListItem>
+                                    )
+                                }}
+                        ></FlatList>
+                </ScrollView>
             </View>
         )
     }
