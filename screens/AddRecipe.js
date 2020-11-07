@@ -30,28 +30,28 @@ export default class AddRecipeScreen extends Component {
         this.state = {
             cuisine:'unknown',
             recipe:'',
+            cuisineDisplayName:'',
             dishName:'',
             ingridients:'',
-            background1 : 'white',
-            background2 : 'white',
-            background3 : 'white',
-            background4 : 'white',
-
         }
     }
 
+    //Creating a function to add recipe in the database
     addDish = ()=>{
         const recipe = this.state.recipe
         const ingridients = this.state.ingridients
         const cuisine = this.state.cuisine
+        const cuisineDisplayName = this.state.cuisineDisplayName
         const dish = this.state.dishName
 
+        //Proceed only if all the entries are entered
         if(recipe!='' && ingridients!='' && cuisine!=''&&dish!=''){
             db.collection('dishes').add({
                 'dishName' : dish,
                 'cuisine' : cuisine,
                 'ingridients' : ingridients,
                 'recipe' : recipe,
+                'cuisneDisplayName': cuisineDisplayName
             })
     
             Alert.alert('Dish added succesfully')
@@ -60,13 +60,10 @@ export default class AddRecipeScreen extends Component {
                 recipe:'',
                 dishName:'',
                 ingridients:'',
-                background1 : 'white',
-                background2 : 'white',
-                background3 : 'white',
-                background4 : 'white',
             })
         }
 
+        //If user has not entered all entries display an error message
         else {
             Alert.alert('Please fill all entries')
         }
@@ -87,7 +84,6 @@ export default class AddRecipeScreen extends Component {
                     <TouchableOpacity
                         onPress = {()=>{
                             this.props.navigation.toggleDrawer()
-                            //Alert.alert("Inside Icon Tag")
                         }}
                         style = {{alignSelf:'flex-start', marginTop:30, marginLeft:15,}}
                     >
@@ -136,7 +132,7 @@ export default class AddRecipeScreen extends Component {
                         placeholder = 'Select a Cuisine'
                         onChangeItem = {(item)=>{
                             this.setState({cuisine:item.value})
-                            console.log(item.value)
+                            this.setState({cuisineDisplayName:item.label})
                         }}
                     ></DropDownPicker>
 
@@ -177,6 +173,7 @@ export default class AddRecipeScreen extends Component {
     }
 }
 
+//Creating Styles
 const styles = StyleSheet.create({
     container : {
         flex:1,
